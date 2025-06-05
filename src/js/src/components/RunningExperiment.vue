@@ -52,6 +52,21 @@
             </b-tooltip>
           </template>
         </div>
+               <!-- ADDED RECORDING BUTTON -->
+        <div v-if="roleAllowed('vms/???', 'update', expModal.fullName) && !showModifyStateBar">
+          <template v-if="!expModal.vm.running">                                                                 <!-- change to if recording started -->
+            <b-tooltip label="stop recording" type="is-light">
+              <b-button class="button is-light" icon-left="camera-video" @click="startRecord( expModal.vm.name )">    
+              </b-button>
+            </b-tooltip>
+          </template>
+          <template v-else>
+            <b-tooltip label="start recording" type="is-light">
+              <b-button class="button is-light" icon-left="camera-video-off" @click="stopRecord( expModal.vm.name )">     
+              </b-button>
+            </b-tooltip>
+          </template>
+        </div>
         <div v-if="features.includes('vm-mount') && roleAllowed('vms/mount', 'post', expModal.fullName) && !showModifyStateBar && expModal.vm.running">
           &nbsp;
           <b-tooltip :label="!expModal.vm.ccActive ? 'mount vm (requires active cc)' : 'mount vm'" type="is-light">
