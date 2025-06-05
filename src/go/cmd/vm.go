@@ -682,6 +682,64 @@ func newVMMemorySnapshotCmd() *cobra.Command {
 	return cmd
 }
 
+
+func newVMRecordCmd() *cobra.Command {
+	StartRecord := &cobra.Command{
+		Use:   "namespace <experiment name> && vnc record fb <vm name> <file_name>", 
+		Short: "Start screen recording of a running VM in a specific experiment",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 2 {
+				return fmt.Errorf("Must provide an experiment and VM name")
+			}
+
+			var (
+				expName = args[0]
+				vmName  = args[1]
+				out     = args[2]
+			)
+
+			if err := vm.StartRecord(expName, vmName, out); err != nil {
+				err := util.HumanizeError(err, "Unable to start recording on "+vmName+" VM")
+				return err.Humanized()
+			}
+
+			fmt.Printf("The %s VM in the %s experiment is being recorded\n", vmName, expName)
+
+			return nil
+		},
+	}
+	StopRecord := &cobra.Command{
+		Use:   "vnc stop fb <experiment name> <vm name>", 
+		Short: "Stop screen recording of a running VM in a specific experiment",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 2 {
+				return fmt.Errorf("Must provide an experiment and VM name")
+			}
+
+			var (
+				expName = args[0]
+				vmName  = args[1]
+			)
+
+			if err := vm.StopRecord(expName, vmName); err != nil {
+				err := util.HumanizeError(err, "Unable to stop recording on "+ "+vmName+" VM")
+				return err.Humanized()
+			}
+
+			// add an error for if there isn't a recording already started on that vm
+			// mm vnc should list what its recording 
+
+			fmt.Printf("The %s VM in the %s experiment has stopped being recorded\n", vmName, expName)
+
+			return nil
+		},
+	}
+	
+	cmd.AddCommand(StartRecord)
+	cmd.AddCommand(StopRecord)
+	
+	return cmd
+}
 func init() {
 	vmCmd := newVMCmd()
 
